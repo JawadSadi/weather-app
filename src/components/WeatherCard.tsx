@@ -1,79 +1,72 @@
 import React, { useEffect, useState } from "react";
 import { useGeoLocation } from "../hooks/useGeolocation";
-import { fetchWeather } from "../api/weather";
-import {
-  FiWind,
-  FiDroplet,
-  FiArrowDown,
-  FiArrowUp,
-  FiBarChart2,
-} from "react-icons/fi";
-import ForecastCard from "./ForecastCard";
+import { fetchForecast } from "../api/weather";
+import { format, parseISO } from "date-fns";
+import WeatherDetailCard from "./WeatherDetailCard";
 
-const WeatherCard = () => {
+export default function WeatherApp() {
   const { location, error } = useGeoLocation();
-  const [weather, setWeather] = useState<any>(null);
+  const [forecastData, setForecastData] = useState<any[]>([]);
+  const [selectedDay, setSelectedDay] = useState<string>("");
 
   useEffect(() => {
     if (location) {
-      fetchWeather(location.lat, location.lon)
-        .then(setWeather)
+      fetchForecast(location.lat, location.lon)
+        .then((data) => {
+          const grouped: Record<string, any[]> = {};
+
+          data.list.forEach((item: any) => {
+            const date = item.dt_txt.split(" ")[0]; // YYYY-MM-DD
+            if (!grouped[date]) grouped[date] = [];
+            grouped[date].push(item);
+          });
+
+          const days = Object.entries(grouped).map(([date, list]) => ({
+            date,
+            data: list,
+          }));
+
+          setForecastData(days);
+          setSelectedDay(days[0].date);
+        })
         .catch(console.error);
     }
   }, [location]);
 
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-400 to-sky-600 text-white p-4">
-      {error && <p>{error}</p>}
-      {!location && !error && <p>Getting location...</p>}
-      {weather ? (
-        <div className="bg-white text-gray-800 rounded-xl p-6 shadow-xl w-full max-w-md">
-          <h1 className="text-xl font-bold">{weather.name}</h1>
-          <p className="text-5xl font-semibold my-4">
-            {Math.round(weather.main.temp)}°C
-          </p>
-          <p className="capitalize mb-4">{weather.weather[0].description}</p>
+  const selectedForecast = forecastData.find((day) => day.date === selectedDay);
 
-          <div className="grid grid-cols-2 gap-4 text-sm text-gray-700 mt-4">
-            <div className="flex items-center gap-2">
-              <FiDroplet className="text-blue-500" />
-              <span>Humidity:</span>
-              <span className="ml-auto">{weather.main.humidity}%</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <FiWind className="text-blue-500" />
-              <span>Wind:</span>
-              <span className="ml-auto">
-                {weather.wind.speed * (18 / 5)} km/hr
-              </span>
-            </div>
-            <div className="flex items-center gap-2">
-              <FiBarChart2 className="text-blue-500" />
-              <span>Pressure:</span>
-              <span className="ml-auto">{weather.main.pressure} hPa</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <FiArrowDown className="text-blue-500" />
-              <span>Min:</span>
-              <span className="ml-auto">
-                {Math.round(weather.main.temp_min)}°C
-              </span>
-            </div>
-            <div className="flex items-center gap-2">
-              <FiArrowUp className="text-red-500" />
-              <span>Max:</span>
-              <span className="ml-auto">
-                {Math.round(weather.main.temp_max)}°C
-              </span>
-            </div>
-          </div>
-          {weather && <ForecastCard />}
-        </div>
-      ) : (
-        !error && <p>Loading weather...</p>
-      )}
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-sky-500 to-blue-700 text-white">
+      {/* Navbar */}
+      <nav className="bg-white text-blue-700 shadow-md py-4 px-6 text-lg font-bold">
+        Weather App 🌤
+      </nav>
+
+      {/* لیست روزها */}
+      <div className="flex overflow-x-auto px-4 py-2 gap-2 bg-blue-100 text-gray-800">
+        {forecastData.map((day) => (
+          <button
+            key={day.date}
+            onClick={() => setSelectedDay(day.date)}
+            className={`px-4 py-2 rounded-lg font-medium whitespace-nowrap ${
+              selectedDay === day.date
+                ? "bg-blue-600 text-white"
+                : "bg-gray-200 hover:bg-gray-300"
+            }`}
+          >
+            {format(parseISO(day.date), "EEEE")}
+          </button>
+        ))}
+      </div>
+
+      <div className="p-4">
+        {selectedForecast && (
+          <WeatherDetailCard
+            dayData={selectedForecast.data}
+            date={selectedForecast.date}
+          />
+        )}
+      </div>
     </div>
   );
-};
-
-export default WeatherCard;
+}

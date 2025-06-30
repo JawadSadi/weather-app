@@ -1,4 +1,4 @@
-const API_KEY = "879a28f6b8099b7aec6c1dff720bd806"; // از https://openweathermap.org بگیر
+const API_KEY = "879a28f6b8099b7aec6c1dff720bd806"; // my API key
 
 export async function fetchWeather(lat: number, lon: number) {
   const res = await fetch(

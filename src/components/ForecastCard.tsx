@@ -1,9 +1,8 @@
 import React, { useState } from "react";
 import { useForecast } from "../hooks/useForecast";
-// فرض بر این است که این hook پیش‌بینی را می‌آورد
 
 export default function ForecastList() {
-  const forecast = useForecast(); // این فرض شده که داده forecast از این hook می‌آید
+  const forecast = useForecast();
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
 
   if (!forecast || forecast.length === 0) return <p>Loading forecast...</p>;

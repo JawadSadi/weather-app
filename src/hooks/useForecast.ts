@@ -1,7 +1,7 @@
 // hooks/useForecast.ts
 import { useEffect, useState } from "react";
 
-const API_KEY = "879a28f6b8099b7aec6c1dff720bd806"; // ⬅️ Replace this with your actual API key
+const API_KEY = "879a28f6b8099b7aec6c1dff720bd806"; //  my API key
 const BASE_URL = "https://api.openweathermap.org/data/2.5/forecast";
 
 export function useForecast() {
