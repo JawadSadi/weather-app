@@ -8,6 +8,7 @@ import {
   FiArrowUp,
   FiBarChart2,
 } from "react-icons/fi";
+import ForecastCard from "./ForecastCard";
 
 const WeatherCard = () => {
   const { location, error } = useGeoLocation();
@@ -66,6 +67,7 @@ const WeatherCard = () => {
               </span>
             </div>
           </div>
+          {weather && <ForecastCard />}
         </div>
       ) : (
         !error && <p>Loading weather...</p>

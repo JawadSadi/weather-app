@@ -7,3 +7,11 @@ export async function fetchWeather(lat: number, lon: number) {
   if (!res.ok) throw new Error("Failed to fetch weather data");
   return await res.json();
 }
+
+export const fetchForecast = async (lat: number, lon: number) => {
+  const res = await fetch(
+    `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric`
+  );
+  const data = await res.json();
+  return data;
+};
