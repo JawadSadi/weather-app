@@ -15,3 +15,21 @@ export const fetchForecast = async (lat: number, lon: number) => {
   const data = await res.json();
   return data;
 };
+
+// src/api/weather.ts
+
+export async function fetchWeatherByCity(city: string) {
+  const res = await fetch(
+    `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${API_KEY}`
+  );
+  if (!res.ok) throw new Error("City not found");
+  return await res.json();
+}
+
+export async function fetchForecastByCity(city: string) {
+  const res = await fetch(
+    `https://api.openweathermap.org/data/2.5/forecast?q=${city}&units=metric&appid=${API_KEY}`
+  );
+  if (!res.ok) throw new Error("City not found");
+  return await res.json();
+}
