@@ -1,14 +1,14 @@
 // src/components/WeatherApp.tsx
-import { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useGeoLocation } from "../hooks/useGeolocation";
 import { fetchForecast } from "../api/weather";
 import { format, parseISO } from "date-fns";
 import WeatherDetailCard from "./WeatherDetailCard";
 import SearchBox from "./SearchBox";
 import { AnimatePresence, motion } from "framer-motion";
+import { useWeatherStore } from "../store/weatherStore";
 
 function getSuggestionEn(weather: string): string {
-  console.log(weather);
   const lower = weather.toLowerCase();
 
   if (lower.includes("rain")) return "Don't forget your umbrella ☔";
@@ -22,18 +22,21 @@ function getSuggestionEn(weather: string): string {
 
 export default function WeatherApp() {
   const { location } = useGeoLocation();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [forecastData, setForecastData] = useState<any[]>([]);
-  const [selectedDay, setSelectedDay] = useState<string>("");
-  const [cityName, setCityName] = useState<string>("Your Location");
+  const {
+    forecastData,
+    selectedDay,
+    setForecastData,
+    setSelectedDay,
+    cityName,
+    setCityName,
+  } = useWeatherStore();
 
-  // load default location on mount
   useEffect(() => {
     if (location) {
       fetchForecast(location.lat, location.lon)
         .then((data) => {
           const grouped = groupForecast(data.list);
-          setForecastData(grouped);
+          setForecastData(grouped, cityName);
           setSelectedDay(grouped[0].date);
           setCityName(data.city.name);
         })
@@ -41,10 +44,7 @@ export default function WeatherApp() {
     }
   }, [location]);
 
-  // helper for grouping
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const groupForecast = (list: any[]) => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const grouped: Record<string, any[]> = {};
     list.forEach((item) => {
       const date = item.dt_txt.split(" ")[0];
@@ -54,12 +54,11 @@ export default function WeatherApp() {
     return Object.entries(grouped).map(([date, data]) => ({ date, data }));
   };
 
-  // when user searches for a new city
   const handleCitySelect = (lat: number, lon: number, name: string) => {
     fetchForecast(lat, lon)
       .then((data) => {
         const grouped = groupForecast(data.list);
-        setForecastData(grouped);
+        setForecastData(grouped, cityName);
         setSelectedDay(grouped[0].date);
         setCityName(name);
       })
@@ -79,6 +78,7 @@ export default function WeatherApp() {
       </div>
     );
   }
+
   return (
     <>
       <motion.div
@@ -90,7 +90,6 @@ export default function WeatherApp() {
         className="bg-white bg-opacity-20 rounded-lg shadow-lg"
       >
         <div className="min-h-screen bg-gradient-to-br from-sky-500 to-blue-700 text-white">
-          {/* Navbar */}
           <nav className="bg-white text-blue-700 shadow-md py-3 px-4 text-lg font-bold flex justify-between items-center">
             <div className="text-xl font-bold">
               Weather App 🌤
@@ -101,7 +100,6 @@ export default function WeatherApp() {
             <SearchBox onCitySelect={handleCitySelect} />
           </nav>
 
-          {/* {days} */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 px-4 py-3 bg-blue-100 text-gray-800">
             <div className="flex flex-wrap gap-2 overflow-x">
               {forecastData.map((day) => (
@@ -123,16 +121,15 @@ export default function WeatherApp() {
             </div>
           </div>
 
-          {/* جزییات هوا */}
           <div className="p-4">
             <AnimatePresence mode="wait">
               {selectedForecast && (
                 <motion.div
-                  key={selectedDay + cityName} // force animation when day or city changes
+                  key={selectedDay + cityName}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -20 }}
-                  transition={{ duration: 0.5 }}
+                  transition={{ duration: 0.4 }}
                 >
                   <WeatherDetailCard
                     dayData={selectedForecast.data}
@@ -145,15 +142,13 @@ export default function WeatherApp() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, ease: "easeOut" }}
-              className="mt-2 p-5 bg-gradient-to-r from-yellow-100 to-orange-100 rounded-xl shadow-md border-l-4 border-yellow-400"
+              className="mt-2 p-5 bg-gradient-to-r from-blue-200 to-blue-400 rounded-xl shadow-md "
             >
               <h3 className="text-lg font-semibold text-yellow-800 mb-2">
                 📌 Daily Suggestion
               </h3>
               <p className="text-yellow-900">
-                {getSuggestionEn(
-                  selectedForecast.data[0].weather[0].description
-                )}
+                {getSuggestionEn(forecastData[0].data[0].weather[0].main)}
               </p>
             </motion.div>
           </div>

@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
+import { useWeatherStore } from "../store/weatherStore";
 
 const API_KEY = "879a28f6b8099b7aec6c1dff720bd806";
 
@@ -7,9 +8,8 @@ export default function SearchBox({
 }: {
   onCitySelect: (lat: number, lon: number, name: string) => void;
 }) {
-  const [query, setQuery] = useState("");
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [suggestions, setSuggestions] = useState<any[]>([]);
+  const { query, suggestions, setQuery, setSuggestions, clearSearch } =
+    useWeatherStore();
 
   useEffect(() => {
     if (query.trim().length < 2) {
@@ -27,18 +27,16 @@ export default function SearchBox({
     }, 300);
 
     return () => clearTimeout(timeout);
-  }, [query]);
+  }, [query, setSuggestions]);
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleSearch = (item: any) => {
     onCitySelect(item.lat, item.lon, item.name);
-    setQuery("");
-    setSuggestions([]);
+    clearSearch();
   };
 
   return (
-    <div className="relative w-full">
-      <div className="flex gap-2">
+    <div className="relative">
+      <div className="flex ">
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
