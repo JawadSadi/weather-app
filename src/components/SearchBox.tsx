@@ -1,7 +1,6 @@
-// src/components/SearchBox.tsx
 import { useState, useEffect } from "react";
 
-const API_KEY = "879a28f6b8099b7aec6c1dff720bd806"; // 🔁 این را با key خودت جایگزین کن
+const API_KEY = "879a28f6b8099b7aec6c1dff720bd806";
 
 export default function SearchBox({
   onCitySelect,
@@ -9,6 +8,7 @@ export default function SearchBox({
   onCitySelect: (lat: number, lon: number, name: string) => void;
 }) {
   const [query, setQuery] = useState("");
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [suggestions, setSuggestions] = useState<any[]>([]);
 
   useEffect(() => {
@@ -24,11 +24,12 @@ export default function SearchBox({
         .then((res) => res.json())
         .then(setSuggestions)
         .catch(() => setSuggestions([]));
-    }, 300); // 🔁 دی‌بونس برای کاهش تعداد درخواست‌ها
+    }, 300);
 
     return () => clearTimeout(timeout);
   }, [query]);
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleSearch = (item: any) => {
     onCitySelect(item.lat, item.lon, item.name);
     setQuery("");
@@ -36,8 +37,8 @@ export default function SearchBox({
   };
 
   return (
-    <div className="relative ml-auto w-full max-w-xs">
-      <div>
+    <div className="relative w-full">
+      <div className="flex gap-2">
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}

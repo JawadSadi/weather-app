@@ -8,6 +8,7 @@ export default function WeatherDetailCard({
   dayData,
   date,
 }: {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   dayData: any[];
   date: string;
 }) {
@@ -17,7 +18,7 @@ export default function WeatherDetailCard({
         Forecast for {format(parseISO(date), "MMMM dd, yyyy")}
       </h2>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-5">
+      <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4">
         {dayData.map((item, index) => {
           const time = item.dt_txt.split(" ")[1].slice(0, 5);
           return (
