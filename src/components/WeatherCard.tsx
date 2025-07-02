@@ -7,6 +7,7 @@ import SearchBox from "./SearchBox";
 import { AnimatePresence, motion } from "framer-motion";
 import { useWeatherStore } from "../store/weatherStore";
 import { getSuggestionEn } from "../helperFunctions";
+import WeatherNews from "./WeatherNews";
 
 export default function WeatherApp() {
   const { location } = useGeoLocation();
@@ -140,6 +141,7 @@ export default function WeatherApp() {
               </p>
             </motion.div>
           </div>
+          <WeatherNews />
         </div>
       </motion.div>
     </>
