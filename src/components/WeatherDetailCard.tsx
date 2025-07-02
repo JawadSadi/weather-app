@@ -3,6 +3,13 @@ import { FiWind, FiDroplet, FiBarChart2 } from "react-icons/fi";
 import { iconMap } from "../icons";
 import { WiDaySunny } from "react-icons/wi";
 import { motion } from "framer-motion";
+import { useEffect } from "react";
+import { useWeatherStore } from "../store/weatherStore";
+import {
+  getSuggestionEn,
+  shouldSendNotificationToday,
+  showDailyNotification,
+} from "../helperFunctions";
 
 export default function WeatherDetailCard({
   dayData,
@@ -12,6 +19,17 @@ export default function WeatherDetailCard({
   dayData: any[];
   date: string;
 }) {
+  const { forecastData, cityName } = useWeatherStore();
+
+  useEffect(() => {
+    if (forecastData && shouldSendNotificationToday()) {
+      const weather = `${Math.round(forecastData[3].data[0].main.temp)}°C`;
+      const suggestion = getSuggestionEn(
+        forecastData[0].data[0].weather[0].main
+      );
+      showDailyNotification(`Today in ${cityName}: ${weather} ${suggestion}`);
+    }
+  }, [forecastData, cityName]);
   return (
     <div className="bg-white text-gray-800 rounded-lg shadow-lg p-6">
       <h2 className="text-2xl font-bold mb-6 text-blue-700">

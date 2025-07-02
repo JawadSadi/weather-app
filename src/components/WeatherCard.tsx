@@ -1,5 +1,4 @@
-// src/components/WeatherApp.tsx
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { useGeoLocation } from "../hooks/useGeolocation";
 import { fetchForecast } from "../api/weather";
 import { format, parseISO } from "date-fns";
@@ -7,18 +6,7 @@ import WeatherDetailCard from "./WeatherDetailCard";
 import SearchBox from "./SearchBox";
 import { AnimatePresence, motion } from "framer-motion";
 import { useWeatherStore } from "../store/weatherStore";
-
-function getSuggestionEn(weather: string): string {
-  const lower = weather.toLowerCase();
-
-  if (lower.includes("rain")) return "Don't forget your umbrella ☔";
-  if (lower.includes("snow")) return "Wear warm clothes and be careful ❄️";
-  if (lower.includes("clear")) return "Use sunscreen today ☀️";
-  if (lower.includes("cloud")) return "It might be chilly, dress warmly 🌥️";
-  if (lower.includes("wind")) return "It's windy today, take care 💨";
-
-  return "Have a wonderful day 🌈";
-}
+import { getSuggestionEn } from "../helperFunctions";
 
 export default function WeatherApp() {
   const { location } = useGeoLocation();
